@@ -1,0 +1,48 @@
+/*{
+    "author": "Michael Josephson",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "org.josephson.of.CheckReviewIntervals",
+    "version": "0.1",
+    "description": "A plug-in that...",
+    "label": "Check Review Intervals",
+    "mediumLabel": "Check Review Intervals",
+    "paletteLabel": "Check Review Intervals",
+}*/
+(() => {
+    var action = new PlugIn.Action(function(selection) {
+        // Add code to run when the action is invoked
+        console.log("Selection is");
+        console.log(selection);
+        checkReviews(globalThis);
+    });
+
+    function checkReviews(obj) {
+        obj.projects.forEach((project) => {
+            if (project.status !== Project.Status.Done && project.status !== Project.Status.Dropped) {
+                const description = project.status === Project.Status.Active ? 'active' : 'inactive';
+                let interval = project.reviewInterval;
+                if ((interval.unit === 'months' && interval.steps > 1) ||
+                    interval.unit === 'years' ||
+                    (interval.unit === 'weeks'&& interval.steps > 4) ||
+                    (interval.unit === 'days '&& interval.steps > 31)) {
+                    console.log('⚠️ Infrequent review of ' + description + ' project: ' + project.name + ' (' + interval.steps + ' ' + interval.unit + ')');
+                }
+            }
+        });
+
+        obj.folders.forEach((folder) => {
+            console.log(folder);
+            checkReviews(folder);
+        });
+    }
+
+    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
+    /*
+    action.validate = function(selection){
+
+    };
+    */
+        
+    return action;
+})();
